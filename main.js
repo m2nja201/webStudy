@@ -11,33 +11,47 @@ var app = http.createServer(function(request, response){
     // 따라서 queryData.id 는 HTML로 나오게 된다.
     var title = queryData.id;
     var pathname = url.parse(_url, true).pathname;
+    var des = '';
 
     if (pathname === '/'){
-      fs.readFile(`data/${title}`, 'utf8', function(err, description){
-        // template에다가 1.html 넣어주기
-        var h1tem = `
-        <!doctype html>
-        <html>
-        <head>
-          <title>WEB1 - ${title}</title>
-          <meta charset="utf-8">
-        </head>
-        <body>
-          <h1><a href="/">WEB</a></h1>
-          <ul>
-            <li><a href="/?id=HTML">HTML</a></li>
-            <li><a href="/?id=CSS">CSS</a></li>
-            <li><a href="/?id=JavaScript">JavaScript</a></li>
-          </ul>
-          <h2>${title}</h2>
-          <p>${description}
-          </p>
-        </body>
-        </html>    
-        `;
-        response.writeHead(200); // 성공적으로 서버에 보내지면 200
-        response.end(h1tem);
-      });
+      if(title === undefined){
+        title='Welcome';
+        des = 'HELLO node js';
+      }
+
+      fs.readdir('./data', function(err, filelist){
+        fs.readFile(`data/${title}`, 'utf8', function(err, description){
+          // template에다가 1.html 넣어주기
+          if (description === undefined) description='';
+          var i = 0;
+          var list = `<ul>`; // ul 태그 열기
+          while(i<filelist.length){
+            list += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+            i++;
+          }
+          list += `</ul>`;  // ul 태그 닫기
+
+          var h1tem = `
+          <!doctype html>
+          <html>
+          <head>
+            <title>WEB1 - ${title}</title>
+            <meta charset="utf-8">
+          </head>
+          <body>
+            <h1><a href="/">WEB</a></h1>
+            ${list}
+            <h2>${title}</h2>
+            <p>${description}${des}
+            </p>
+          </body>
+          </html>    
+          `;
+          response.writeHead(200); // 성공적으로 서버에 보내지면 200
+          response.end(h1tem);
+        });
+      })
+      
     } else{
       response.writeHead(404); // 실패하면 404 
       response.end('Not found'); // 뒤에 아무거나 치면 not found 뜸
