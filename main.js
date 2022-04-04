@@ -92,9 +92,12 @@ var app = http.createServer(function(request, response){
         var title_p = post.title;
         var description_p = post.description;
         console.log(post);
+        fs.writeFile(`data/${title_p}`, description_p, 'utf8', function(err){
+          response.writeHead(302, {Location: `/?id=${title_p}`}); // 성공적으로 서버에 보내지면 302 : 다른 위치로 이동
+          response.end('success');
+        });
       });
-      response.writeHead(200); // 성공적으로 서버에 보내지면 200
-      response.end('success');
+      
     }
     else{
       response.writeHead(404); // 실패하면 404 
