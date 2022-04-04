@@ -3,6 +3,7 @@ var http = require('http');
 var fs = require('fs');
 var url = require('url'); // url이라는 모듈을 url이라는 변수로 쓸 것이다.
 const path = require('path');
+var qs = require('querystring');
 
 function templateHTML(title, list, body){
   return `
@@ -68,7 +69,7 @@ var app = http.createServer(function(request, response){
         var list = templateLIST(filelist);
         console.log(list);
         var template = templateHTML(title, list, `
-        <form action="http://localhost:3000/process_create" method="post"> <!--해당 서버로 전달하고 싶다 / post를 사용하면 뒤에 데이터를 은밀하게 숨김-->
+        <form action="http://localhost:3000/create_process" method="post"> <!--해당 서버로 전달하고 싶다 / post를 사용하면 뒤에 데이터를 은밀하게 숨김-->
         <p><input type="text" name="title" placeholder="title"></p>
         <p><textarea placeholder="description"></textarea></p>
         <p>
@@ -79,7 +80,22 @@ var app = http.createServer(function(request, response){
         response.writeHead(200); // 성공적으로 서버에 보내지면 200
         response.end(template);
       })
-    } 
+    } else if(pathname === '/create_process'){
+      var body = '';
+      request.on('data', function(data){
+        body += data;
+      });
+      // 더이상 들어올 정보가 없다
+      request.on('end', function(){
+        var post = qs.parse(body); // 정보가 들어있음(객체화)
+        // 이때 post.title, post.description을 하면 정보를 각자 찾아낼 수 있음
+        var title_p = post.title;
+        var description_p = post.description;
+        console.log(post);
+      });
+      response.writeHead(200); // 성공적으로 서버에 보내지면 200
+      response.end('success');
+    }
     else{
       response.writeHead(404); // 실패하면 404 
       response.end('Not found'); // 뒤에 아무거나 치면 not found 뜸
