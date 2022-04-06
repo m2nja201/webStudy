@@ -5,34 +5,37 @@ var url = require('url'); // url이라는 모듈을 url이라는 변수로 쓸 �
 const path = require('path');
 var qs = require('querystring');
 
-function templateHTML(title, list, body, control){
-  return `
-    <!doctype html>
-    <html>
-    <head>
-      <title>WEB2 - ${title}</title>
-      <meta charset="utf-8">
-    </head>
-    <body>
-      <h1><a href="/">WEB</a></h1>
-      ${list}
-      ${control}
-      ${body}
-    </body>
-    </html>
-  `;
+var template = {
+  HTML: function (title, list, body, control){
+    return `
+      <!doctype html>
+      <html>
+      <head>
+        <title>WEB2 - ${title}</title>
+        <meta charset="utf-8">
+      </head>
+      <body>
+        <h1><a href="/">WEB</a></h1>
+        ${list}
+        ${control}
+        ${body}
+      </body>
+      </html>
+    `;
+  },
+  LIST : function (filelist){
+    var samplelist = `<ul>`; // ul 태그 열기
+    var i = 0;
+    while(i<filelist.length){
+      samplelist += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
+      i++;
+    }
+    samplelist += `</ul>`;  // ul 태그 닫기
+    return samplelist;
+  }
 }
 
-function templateLIST(filelist){
-  var samplelist = `<ul>`; // ul 태그 열기
-  var i = 0;
-  while(i<filelist.length){
-    samplelist += `<li><a href="/?id=${filelist[i]}">${filelist[i]}</a></li>`;
-    i++;
-  }
-  samplelist += `</ul>`;  // ul 태그 닫기
-  return samplelist;
-}
+
 
 var app = http.createServer(function(request, response){
     var _url = request.url;
@@ -54,8 +57,8 @@ var app = http.createServer(function(request, response){
           // template에다가 1.html 넣어주기
           if (description === undefined) description='';
           
-          var list = templateLIST(filelist);
-          var h1tem = templateHTML(title, list, `<h2>${title}</h2>
+          var list = template.LIST(filelist);
+          var h1tem = template.HTML(title, list, `<h2>${title}</h2>
           <p>${description}${des}</p>`,
           `<a href="/create">create</a> <a href="/update?id=${title}">update</a> <form action="/delete_process" method ="post">
             <input type="hidden" name="id" value="${title}">
@@ -70,9 +73,9 @@ var app = http.createServer(function(request, response){
       fs.readdir('./data', function(err, filelist){
         var title = 'WEB - create';
         var description = 'Hello, Node.js';
-        var list = templateLIST(filelist);
+        var list = template.LIST(filelist);
         console.log(list);
-        var template = templateHTML(title, list, `
+        var template = template.HTML(title, list, `
         <form action="/create_process" method="post"> <!--해당 서버로 전달하고 싶다 / post를 사용하면 뒤에 데이터를 은밀하게 숨김-->
         <p><input type="text" name="title" placeholder="title"></p>
         <p><textarea name="description" placeholder="description"></textarea></p>
@@ -107,8 +110,8 @@ var app = http.createServer(function(request, response){
           // template에다가 1.html 넣어주기
           if (description === undefined) description='';
           
-          var list = templateLIST(filelist);
-          var h1tem = templateHTML(title, list, `<form action="/update_process" method="post"> <!--해당 서버로 전달하고 싶다 / post를 사용하면 뒤에 데이터를 은밀하게 숨김-->
+          var list = template.LIST(filelist);
+          var h1tem = template.HTML(title, list, `<form action="/update_process" method="post"> <!--해당 서버로 전달하고 싶다 / post를 사용하면 뒤에 데이터를 은밀하게 숨김-->
           <p><input type="hidden" name="id" value="${title}"></p>
           <p><input type="text" name="title" placeholder="title" value="${title}"</p>
           <p><textarea name="description" placeholder="description">${description}</textarea></p>
