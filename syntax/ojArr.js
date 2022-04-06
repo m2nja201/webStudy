@@ -39,3 +39,8 @@ var g = {
 
 g.f1();
 g.f2();
+
+var part = require('./module.js');
+// './'는 현재 디렉토리(같은 디렉토리)
+console.log(part);
+part.f();
