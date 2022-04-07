@@ -2,7 +2,7 @@
 var http = require('http');
 var fs = require('fs');
 var url = require('url'); // url이라는 모듈을 url이라는 변수로 쓸 것이다.
-var path = require('path');
+//var paths = require('path');
 var qs = require('querystring');
 
 var template = require('./lib/template.js');
@@ -13,7 +13,7 @@ var app = http.createServer(function(request, response){
     var queryData = url.parse(_url, true).query; // 객체로 담겨 있다. => { id : HTML }
     // 따라서 queryData.id 는 HTML로 나오게 된다.
     var title = queryData.id;
-    var filteredID = path.parse(title).base;
+    //var filteredID = paths.parse(title).base;
     var pathname = url.parse(_url, true).pathname;
     var des = '';
 
@@ -22,9 +22,9 @@ var app = http.createServer(function(request, response){
         title='Welcome';
         des = 'HELLO node js';
       }
-
+      console.log(pathname);
       fs.readdir('./data', function(err, filelist){
-        fs.readFile(`data/${filteredID}`, 'utf8', function(err, description){
+        fs.readFile(`data/${title}`, 'utf8', function(err, description){
           // template에다가 1.html 넣어주기
           if (description === undefined) description='';
           
@@ -77,7 +77,7 @@ var app = http.createServer(function(request, response){
       });
     } else if (pathname==='/update'){
       fs.readdir('./data', function(err, filelist){
-        fs.readFile(`data/${filteredID}`, 'utf8', function(err, description){
+        fs.readFile(`data/${title}`, 'utf8', function(err, description){
           // template에다가 1.html 넣어주기
           if (description === undefined) description='';
           
@@ -125,8 +125,8 @@ var app = http.createServer(function(request, response){
       request.on('end', function(){
         var post = qs.parse(body); // 정보가 들어있음(객체화)
         var id_p = post.id;
-        var filteredID_p = path.parse(id).base;
-        fs.unlink(`data/${filteredID_p}`, function(err){
+        //var filteredID_p = paths.parse(id).base;
+        fs.unlink(`data/${id_p}`, function(err){
           response.writeHead(302, {Location: `/`}); 
           response.end();
         })
